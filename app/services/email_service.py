@@ -3,7 +3,7 @@ from email.message import EmailMessage
 from app.core.config import settings
 
 async def send_verification_email(to_email: str, verification_uuid: str):
-    verification_link = f"{settings.FRONTEND_URL}/auth/verify-email/{verification_uuid}"
+    verification_link = f"{settings.FRONTEND_URL}/verification/email/{verification_uuid}"
     email_content = f"""
     <html>
         <body style="text-align: center; font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">

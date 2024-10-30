@@ -50,7 +50,7 @@ async def test_validate_user_in_bbdd():
     assert inserted_user_id is not None
 
     async with AsyncClient(transport=transport, base_url="http://test") as async_client:
-        response = await async_client.get(f"/auth/verify-email/{verification_uuid}")
+        response = await async_client.get(f"/verification/email/{verification_uuid}")
     
     assert response.status_code == 200
     assert response.json()["message"] == "Correo verificado exitosamente"

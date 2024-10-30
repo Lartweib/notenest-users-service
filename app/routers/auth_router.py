@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.models.user_model import User
 from app.schemas.user_schema import UserResponse
 from app.services.email_service import send_verification_email
-from app.services.user_service import register_new_user, check_user_exists, update_user_to_verified, get_user_email_by_uuid
+from app.services.user_service import register_new_user, check_user_exists
 
 
 router = APIRouter()
@@ -10,8 +10,10 @@ router = APIRouter()
 @router.post("/register", response_model=UserResponse, response_description="Registrar un nuevo usuario")
 async def register_user(user: User):
 
-    if await check_user_exists(user.email):
+    if await check_user_exists(user.email, "email"):
         raise HTTPException(status_code=400, detail="El usuario con este correo ya existe")
+    if await check_user_exists(user.username, "username"):
+        raise HTTPException(status_code=400, detail="El usuario con este nombre de usuario ya existe")
 
     user_data = await register_new_user(user)
 
@@ -22,17 +24,3 @@ async def register_user(user: User):
         raise HTTPException(status_code=500, detail="Hubo un problema al registrar el usuario")
 
 
-
-@router.get("/verify-email/{verification_uuid}", response_description="Verificar correo electrónico")
-async def verify_email(verification_uuid: str):
-    email = await get_user_email_by_uuid(verification_uuid)
-
-    if not email:
-        raise HTTPException(status_code=400, detail="No se encontró el usuario")
-
-    updated_user = await update_user_to_verified(email)
-
-    if updated_user:
-        return {"message": "Correo verificado exitosamente"}
-    else:
-        raise HTTPException(status_code=400, detail="No se encontró el usuario o ya está verificado")

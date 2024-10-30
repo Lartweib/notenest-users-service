@@ -3,8 +3,13 @@ from app.db.mongo import user_collection
 from app.core.security import hash_password
 from app.models.user_model import User
 
-async def check_user_exists(email: str):
-    return await user_collection.find_one({"email": email})
+async def check_user_exists(data: str, type: str = "email"):
+    if type == "email":
+        return await user_collection.find_one({"email": data})
+    elif type == "username":
+        return await user_collection.find_one({"username": data})
+    else:
+        return None
 
 async def get_user_email_by_uuid(verification_uuid: str):
     user = await user_collection.find_one({"verification_uuid": verification_uuid})
