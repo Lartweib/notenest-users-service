@@ -26,11 +26,11 @@ async def test_register_user_and_mock_email(mocker):
 
         response = await async_client.post("/auth/register", json=user_data)
 
-        assert response.status_code == 200
-        assert response.json()["message"] == "Usuario registrado exitosamente, por favor verifica tu email"
+        assert response.status_code == 200, "El status code no es 200"
+        assert response.json()["message"] == "Usuario registrado exitosamente, por favor verifica tu email", "El mensaje no es el esperado"
 
         mock_send_email.assert_called_once()
-        assert mock_send_email.call_args[0][0] == user_data["email"]
+        assert mock_send_email.call_args[0][0] == user_data["email"], "No se llamo a la funcion con el email correcto"
 
 @pytest.mark.asyncio
 async def test_validate_user_in_bbdd():
@@ -47,11 +47,11 @@ async def test_validate_user_in_bbdd():
 
     inserted_user = await user_collection.insert_one(user_data)
     inserted_user_id = inserted_user.inserted_id
-    assert inserted_user_id is not None
+    assert inserted_user_id is not None, "No se ha insertado el usuario en la base de datos"
 
     async with AsyncClient(transport=transport, base_url="http://test") as async_client:
         response = await async_client.get(f"/verification/email/{verification_uuid}")
     
-    assert response.status_code == 200
-    assert response.json()["message"] == "Correo verificado exitosamente"
+    assert response.status_code == 200, "El status code no es 200"
+    assert response.json()["message"] == "Correo verificado exitosamente", "El mensaje no es el esperado"
 
