@@ -3,7 +3,7 @@ from app.db.mongo import user_collection
 from app.core.security import hash_password
 from app.models.user_model import User
 
-async def check_user_exists(data: str, type: str = "email"):
+async def get_user_if_exists(data: str, type: str = "email"):
     if type == "email":
         return await user_collection.find_one({"email": data})
     elif type == "username":
@@ -30,6 +30,17 @@ async def register_new_user(user: User):
 async def update_user_to_verified(email: str):
     result = await user_collection.update_one(
         {"email": email},
-        {"$set": {"is_verified": True}}
+        {
+            "$set": {"is_verified": True}, 
+            "$unset": {"verification_uuid": ""}
+        }
     )
+    return result.modified_count == 1
+
+async def update_user_refresh_tokens(email: str, refresh_tokens: list):
+    result = await user_collection.update_one(
+        {"email": email},
+        {"$set": {"refresh_tokens": refresh_tokens}}
+    )
+
     return result.modified_count == 1
