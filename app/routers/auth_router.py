@@ -1,20 +1,22 @@
-import json
+import json, jwt
 from bson import json_util
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Header, Depends
+from fastapi.security import HTTPAuthorizationCredentials
 from app.core.config import settings
-from app.core.security import verify_password
+from app.core.security import verify_password, CustomHTTPBearer
 from app.models.user_model import User
 from app.schemas.user_schema import UserResponse
 from app.schemas.login_schema import LoginRequest
-from app.services.auth_service import generate_token_pair
+from app.services.auth_service import generate_token_pair, handle_refresh_token
 from app.services.email_service import send_verification_email
 from app.services.user_service import register_new_user, get_user_if_exists
-from app.core.exceptions import UserAgentInvalidException, TokenGenerationException
+from app.core.exceptions import UserAgentInvalidException, TokenGenerationException, RefreshTokenDataInvalidException, RefreshTokenExpiredException
 
 ACCESS_TOKEN_EXPIRE_TIMES = settings.ACCESS_TOKEN_EXPIRE_TIMES
 REFRESH_TOKEN_EXPIRE_TIMES = settings.REFRESH_TOKEN_EXPIRE_TIMES
 
 router = APIRouter()
+
 
 @router.post("/register", response_model=UserResponse, response_description="Registrar un nuevo usuario")
 async def register_user(user: User):
@@ -59,9 +61,28 @@ async def login(request: Request, login_request: LoginRequest):
     except TokenGenerationException:
         raise HTTPException(status_code=500, detail="Hubo un problema al generar el token")
 
-
     return {
         "message": "Login exitoso",
+        "access_token": token_pair["access_token"],
+        "refresh_token": token_pair["refresh_token"]
+    }
+
+
+@router.post("/refresh-token")
+async def refresh_token(credentials: HTTPAuthorizationCredentials = Depends(CustomHTTPBearer())):
+    refresh_token = credentials.credentials
+
+    try:    
+        token_pair = await handle_refresh_token(refresh_token)
+    except RefreshTokenDataInvalidException:
+        raise HTTPException(status_code=400, detail="Token inválido")
+    except RefreshTokenExpiredException:
+        raise HTTPException(status_code=401, detail="Token expirado")
+    except TokenGenerationException:
+        raise HTTPException(status_code=500, detail="Hubo un problema al generar el token")
+
+    return {
+        "message": "Token renovado exitosamente",
         "access_token": token_pair["access_token"],
         "refresh_token": token_pair["refresh_token"]
     }
