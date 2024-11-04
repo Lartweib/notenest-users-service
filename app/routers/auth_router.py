@@ -3,7 +3,7 @@ from bson import json_util
 from fastapi import APIRouter, HTTPException, Request, Header, Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from app.core.config import settings
-from app.core.security import verify_password, CustomHTTPBearer
+from app.core.security import verify_password, HTTPBearerToken
 from app.models.user_model import User
 from app.schemas.user_schema import UserResponse
 from app.schemas.login_schema import LoginRequest
@@ -69,7 +69,7 @@ async def login(request: Request, login_request: LoginRequest):
 
 
 @router.post("/refresh-token")
-async def refresh_token(credentials: HTTPAuthorizationCredentials = Depends(CustomHTTPBearer())):
+async def refresh_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearerToken())):
     refresh_token = credentials.credentials
 
     try:    
