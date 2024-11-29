@@ -10,7 +10,7 @@ ALGORITHM = settings.ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-class CustomHTTPBearer(HTTPBearer):
+class HTTPBearerToken(HTTPBearer):
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials:
         try:
             return await super().__call__(request)
