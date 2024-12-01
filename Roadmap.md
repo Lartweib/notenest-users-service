@@ -8,9 +8,9 @@
 
 - `/verification/verify-email/{uuid}`
 
-## Gestión del Perfil Inicial: TODO
+## Gestión del Perfil Inicial: OK (faltan tests)
 
-- `/user/profile` → `/user/edit-profile`
+- `/user/profile` → `/user/edit-profile` → `/user/change-email`
 
 ## Seguridad Avanzada: TODO
 

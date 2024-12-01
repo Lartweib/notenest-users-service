@@ -30,7 +30,6 @@ async def register_new_user(user: User):
     else:
         return None
 
-
 async def update_user_to_verified(email: str):
     result = await user_collection.update_one(
         {"email": email},
@@ -38,6 +37,14 @@ async def update_user_to_verified(email: str):
     )
     return result.modified_count == 1
 
+async def change_user_email(email: str, new_email: str):
+    verification_uuid = str(uuid4())
+    result = await user_collection.update_one(
+        {"email": email}, {"$set": {"email": new_email, "verification_uuid": verification_uuid, "is_verified": False}}
+    )
+    if result.modified_count == 1:
+        return verification_uuid
+    return False
 
 async def update_user_data(email: str, data_to_update: dict):
     result = await user_collection.update_one(
