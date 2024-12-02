@@ -18,7 +18,7 @@ async def get_profile(credentials: HTTPAuthorizationCredentials = Depends(HTTPBe
     try:
         payload = decode_token(access_token)
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=400, detail="Token inválido")
+        raise HTTPException(status_code=401, detail="Token inválido")
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expirado")
 

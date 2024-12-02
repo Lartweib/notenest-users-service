@@ -8,7 +8,7 @@
 
 - `/verification/verify-email/{uuid}`
 
-## Gestión del Perfil Inicial: OK (faltan tests)
+## Gestión del Perfil Inicial: OK (faltan tests de edit y change)
 
 - `/user/profile` → `/user/edit-profile` → `/user/change-email`
 
