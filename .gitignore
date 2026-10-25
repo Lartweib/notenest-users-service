@@ -1,4 +1,17 @@
+# Environment
 .env
 .venv/
-__pycache__/
+venv/
 
+# Python
+__pycache__/
+*.py[cod]
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
